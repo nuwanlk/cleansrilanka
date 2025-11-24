@@ -91,11 +91,9 @@ const gotoInsertBtn = document.getElementById('goto-insert');
 const gotoSearchBtn = document.getElementById('goto-search');
 if(gotoInsertBtn) gotoInsertBtn.addEventListener('click', ()=>{ showSection('insert'); });
 if(gotoSearchBtn) gotoSearchBtn.addEventListener('click', async ()=>{ showSection('search'); await performSearch(''); });
-// Home buttons on Insert/Search pages
-const gotoHomeInsertBtn = document.getElementById('goto-home-insert');
-const gotoHomeSearchBtn = document.getElementById('goto-home-search');
-if(gotoHomeInsertBtn) gotoHomeInsertBtn.addEventListener('click', async ()=>{ showSection('home'); await fetchSummaryAndRender(); });
-if(gotoHomeSearchBtn) gotoHomeSearchBtn.addEventListener('click', async ()=>{ showSection('home'); await fetchSummaryAndRender(); });
+// Top-left Home button
+const topHomeBtn = document.getElementById('top-home-btn');
+if(topHomeBtn) topHomeBtn.addEventListener('click', async ()=>{ showSection('home'); await fetchSummaryAndRender(); });
 
 async function performSearch(query=''){
   const q = (query === undefined || query === null) ? document.getElementById('search-input').value.trim() : query.trim();

@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <!-- Top-left Home button -->
+    <button id="top-home-btn" class="top-home" title="Home" aria-label="Home">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9.5L12 3l9 6.5" />
+        <path d="M9 22V12h6v10" />
+      </svg>
+    </button>
     <main class="container">
       <h1>Report Entry</h1>
 
@@ -33,7 +40,6 @@
           <label>Address <span class="req">*</span><textarea id="address" rows="2" required></textarea></label>
           <label>Problem <span class="req">*</span><textarea id="problem" rows="3" required></textarea></label>
           <div class="actions">
-            <button type="button" id="goto-home-insert">Home</button>
             <button type="submit">Submit Report</button>
             <span id="entry-status" class="status"></span>
           </div>
@@ -46,7 +52,6 @@
           <input id="search-input" placeholder="Search by NIC, phone or name" />
           <div style="display:flex;gap:8px;align-items:center">
             <button id="search-btn">Search</button>
-            <button id="goto-home-search" type="button">Home</button>
           </div>
         </div>
         <ul id="results"></ul>

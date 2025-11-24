@@ -18,6 +18,11 @@ button:disabled{opacity:.6;cursor:default}
 /* required-field asterisk */
 .req{color:crimson;font-weight:700;margin-left:6px}
 
+/* Top-left persistent home button */
+.top-home{position:fixed;left:12px;top:12px;z-index:1200;background:var(--card);border:1px solid #e6e6e9;padding:8px;border-radius:8px;box-shadow:0 2px 6px rgba(20,20,40,0.08);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.top-home svg{width:18px;height:18px;color:var(--accent)}
+.top-home:focus{outline:2px solid rgba(43,122,120,0.18)}
+
 /* Home card layout */
 .home-grid{display:flex;gap:16px;align-items:center}
 .chart-wrap{flex:1;min-width:220px}
