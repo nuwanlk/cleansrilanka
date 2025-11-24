@@ -1,0 +1,27 @@
+:root{--bg:#f7f8fb;--card:#fff;--accent:#2b7a78;--muted:#666}
+*{box-sizing:border-box;font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+body{margin:0;background:var(--bg);color:#111}
+.container{max-width:900px;margin:28px auto;padding:12px}
+h1{margin:0 0 18px}
+.card{background:var(--card);padding:16px;border-radius:8px;box-shadow:0 2px 6px rgba(20,20,40,0.04);margin-bottom:16px}
+label{display:block;margin:8px 0;font-size:14px}
+input[type=text],textarea,select{width:100%;padding:8px;border:1px solid #ddd;border-radius:6px}
+.actions{display:flex;align-items:center;gap:12px;margin-top:10px}
+button{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer}
+button:disabled{opacity:.6;cursor:default}
+.search-row{display:flex;gap:8px}
+#results{list-style:none;padding:0;margin-top:10px}
+#results li{padding:8px;border:1px solid #eee;border-radius:6px;margin-bottom:6px;cursor:pointer}
+.status{font-size:13px;color:var(--muted)}
+#detail div.field{margin:6px 0}
+
+/* required-field asterisk */
+.req{color:crimson;font-weight:700;margin-left:6px}
+
+/* Home card layout */
+.home-grid{display:flex;gap:16px;align-items:center}
+.chart-wrap{flex:1;min-width:220px}
+.home-actions{display:flex;flex-direction:column;gap:12px;width:220px}
+.big{padding:14px 18px;font-size:16px;border-radius:8px}
+
+

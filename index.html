@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Report Entry - CleanSriLanka</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Report Entry</h1>
+
+      <section class="card" id="home-card">
+        <h2>Summary</h2>
+        <div class="home-grid">
+          <div class="chart-wrap">
+            <canvas id="summaryChart" width="400" height="180"></canvas>
+          </div>
+          <div class="home-actions">
+            <button id="goto-insert" class="big">Insert Data</button>
+            <button id="goto-search" class="big">Search Data</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="insert-card" class="card">
+        <h2>New Report</h2>
+        <form id="entry-form">
+          <label>Token No <span class="req">*</span><input type="text" id="token" required /></label>
+          <label>NIC<input type="text" id="nic" /></label>
+          <label>Phone No<input type="text" id="phone" /></label>
+          <label>Name <span class="req">*</span><input type="text" id="name" required /></label>
+          <label>Address <span class="req">*</span><textarea id="address" rows="2" required></textarea></label>
+          <label>Problem <span class="req">*</span><textarea id="problem" rows="3" required></textarea></label>
+          <div class="actions">
+            <button type="button" id="goto-home-insert">Home</button>
+            <button type="submit">Submit Report</button>
+            <span id="entry-status" class="status"></span>
+          </div>
+        </form>
+      </section>
+
+      <section id="search-card" class="card">
+        <h2>Search Reports</h2>
+        <div class="search-row">
+          <input id="search-input" placeholder="Search by NIC, phone or name" />
+          <div style="display:flex;gap:8px;align-items:center">
+            <button id="search-btn">Search</button>
+            <button id="goto-home-search" type="button">Home</button>
+          </div>
+        </div>
+        <ul id="results"></ul>
+      </section>
+
+      <section class="card" id="detail-card" style="display:none;">
+        <h2>Report Detail</h2>
+        <div id="detail"></div>
+
+        <form id="update-form">
+          <label>Status
+            <select id="status">
+              <option value="">-- choose --</option>
+              <option value="solved">Solved</option>
+              <option value="not solved">Not Solved</option>
+            </select>
+          </label>
+          <label>Note<textarea id="note" rows="3"></textarea></label>
+          <div class="actions">
+            <button type="submit">Submit Update</button>
+            <span id="update-status" class="status"></span>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <!-- Supabase JS client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/supabase.min.js"></script>
+    <!-- Chart.js for summary graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- User-supplied config (edit with your keys) -->
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
