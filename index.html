@@ -66,6 +66,17 @@
         <ul id="results"></ul>
       </section>
 
+      <section id="login-card" class="card" style="display:none;max-width:350px;margin:32px auto;">
+        <h2>Login</h2>
+        <form id="login-form">
+          <label>Username<input type="text" id="login-username" required /></label>
+          <label>Password<input type="password" id="login-password" required /></label>
+          <div class="actions">
+            <button type="submit">Login</button>
+            <span id="login-status" class="status"></span>
+          </div>
+        </form>
+      </section>
       <section class="card" id="detail-card" style="display:none;">
         <h2>Report Detail</h2>
         <div id="detail"></div>

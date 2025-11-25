@@ -41,12 +41,14 @@ function showSection(name){
   const insert = document.getElementById('insert-card');
   const search = document.getElementById('search-card');
   const detail = document.getElementById('detail-card');
-  const all = [home, insert, search, detail];
+  const login = document.getElementById('login-card');
+  const all = [home, insert, search, detail, login];
   all.forEach(el=>{ if(!el) return; el.style.display = 'none'; });
   if(name === 'home' && home) home.style.display = 'block';
   if(name === 'insert' && insert) insert.style.display = 'block';
   if(name === 'search' && search) search.style.display = 'block';
   if(name === 'detail' && detail) detail.style.display = 'block';
+  if(name === 'login' && login) login.style.display = 'block';
 }
 
 // Chart instance
@@ -140,11 +142,51 @@ document.getElementById('search-input').addEventListener('keydown', (e)=>{ if(e.
 // Remove live search while typing
 // document.getElementById('search-input').addEventListener('input', ()=> performSearch());
 
+let isAuthenticated = false;
+
+function showLogin(){
+  showSection('login');
+  document.getElementById('login-status').textContent = '';
+}
+
+// Simple login logic (replace with real auth as needed)
+document.getElementById('login-form').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const user = document.getElementById('login-username').value.trim();
+  const pass = document.getElementById('login-password').value;
+  // Check credentials from Supabase 'logins' table
+  try {
+    const { data, error } = await supabase.from('logins').select('password').eq('username', user).limit(1);
+    if(error){
+      document.getElementById('login-status').textContent = 'Login error: ' + error.message;
+      document.getElementById('login-status').style.color = 'crimson';
+      return;
+    }
+    if(data && data.length > 0 && data[0].password === pass){
+      isAuthenticated = true;
+      showSection('home');
+      document.getElementById('login-form').reset();
+    }else{
+      document.getElementById('login-status').textContent = 'Invalid credentials';
+      document.getElementById('login-status').style.color = 'crimson';
+    }
+  } catch(err) {
+    document.getElementById('login-status').textContent = 'Login error: ' + err.message;
+    document.getElementById('login-status').style.color = 'crimson';
+  }
+});
+
 // Navigation buttons from home
 const gotoInsertBtn = document.getElementById('goto-insert');
 const gotoSearchBtn = document.getElementById('goto-search');
-if(gotoInsertBtn) gotoInsertBtn.addEventListener('click', ()=>{ showSection('insert'); });
-if(gotoSearchBtn) gotoSearchBtn.addEventListener('click', async ()=>{ showSection('search'); await performSearch(''); });
+if(gotoInsertBtn) gotoInsertBtn.addEventListener('click', ()=>{
+  if(!isAuthenticated){ showSection('login'); return; }
+  showSection('insert');
+});
+if(gotoSearchBtn) gotoSearchBtn.addEventListener('click', async ()=>{
+  if(!isAuthenticated){ showSection('login'); return; }
+  showSection('search'); await performSearch('');
+});
 // Top-left Home button
 const topHomeBtn = document.getElementById('top-home-btn');
 if(topHomeBtn) topHomeBtn.addEventListener('click', async ()=>{
