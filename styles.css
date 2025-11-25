@@ -1,6 +1,16 @@
 :root{--bg:#f7f8fb;--card:#fff;--accent:#2b7a78;--muted:#666}
 *{box-sizing:border-box;font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-body{margin:0;background:var(--bg);color:#111}
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+body{background:var(--bg);color:#111}
 .container{max-width:900px;margin:28px auto;padding:12px}
 h1{margin:0 0 18px}
 .card{background:var(--card);padding:16px;border-radius:8px;box-shadow:0 2px 6px rgba(20,20,40,0.04);margin-bottom:16px}
@@ -223,6 +233,21 @@ button:disabled{opacity:.6;cursor:default}
 #insert-card button[type="submit"]:hover {
   background: linear-gradient(90deg, #0056b3 60%, #007bff 100%);
   transform: translateY(-2px) scale(1.03);
+}
+#main-content {
+  flex: 1 0 auto;
+}
+footer {
+  flex-shrink: 0;
+  position: relative;
+  width: 100%;
+  background: #111;
+  color: #fff;
+  text-align: center;
+  padding: 16px 0 8px 0;
+  font-size: 1.05em;
+  letter-spacing: 0.5px;
+  margin-top: auto;
 }
 
 
