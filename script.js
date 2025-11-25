@@ -307,9 +307,151 @@ document.getElementById('update-form').addEventListener('submit', async (e)=>{
   }catch(err){ updateStatusEl.textContent = 'Update failed: ' + err.message; updateStatusEl.style.color = 'crimson'; }
 });
 
+function attachHandlers() {
+  document.getElementById('search-btn').addEventListener('click', async () => {
+    const token = document.getElementById('search-input').value.trim();
+    const resultEl = document.getElementById('search-result');
+    const updateForm = document.getElementById('search-update-form');
+    resultEl.innerHTML = '';
+    updateForm.style.display = 'none';
+    if(!token){
+      resultEl.innerHTML = '<div style="color:crimson;font-weight:500;">Please enter a token number</div>';
+      return;
+    }
+    try {
+      const { data, error } = await supabase.from('cleansrilankadb').select('*').eq('token', token).limit(1);
+      if(error){
+        resultEl.innerHTML = '<div style="color:crimson;font-weight:500;">Search failed: ' + error.message + '</div>';
+        return;
+      }
+      if(!data || data.length === 0){
+        resultEl.innerHTML = '<div style="color:crimson;font-weight:500;">No results found</div>';
+        return;
+      }
+      // Show result and expanded details immediately
+      const r = data[0];
+      const summary = document.createElement('div');
+      summary.style.padding = '12px 0';
+      summary.style.fontSize = '1.2em';
+      summary.style.color = '#205072';
+      summary.innerHTML = `<strong>${r.token}</strong> - ${r.name} (${r.status || 'new'})`;
+      resultEl.appendChild(summary);
+      // Expand and show all related data
+      const expanded = document.createElement('div');
+      expanded.style.marginTop = '10px';
+      expanded.style.background = '#f7f7f7';
+      expanded.style.borderRadius = '8px';
+      expanded.style.padding = '14px';
+      expanded.innerHTML = `
+        <div><strong>Token No:</strong> ${r.token}</div>
+        <div><strong>Name:</strong> ${r.name}</div>
+        <div><strong>NIC:</strong> ${r.nic || '-'}</div>
+        <div><strong>Phone:</strong> ${r.phone || '-'}</div>
+        <div><strong>Address:</strong> ${r.address || '-'}</div>
+        <div><strong>Problem:</strong> ${r.problem || '-'}</div>
+        <div><strong>Status:</strong> ${r.status || '-'}</div>
+        <div><strong>Note:</strong> ${r.note || '-'}</div>
+      `;
+      // Remove previous expanded if any
+      const prev = resultEl.querySelector('.expanded-details');
+      if(prev) prev.remove();
+      expanded.className = 'expanded-details';
+      resultEl.appendChild(expanded);
+      // Show update form and populate fields
+      updateForm.style.display = 'block';
+      document.getElementById('search-status').value = r.status || '';
+      document.getElementById('search-note').value = r.note || '';
+      updateForm.onsubmit = async function(e){
+        e.preventDefault();
+        const status = document.getElementById('search-status').value;
+        const note = document.getElementById('search-note').value.trim();
+        const statusEl = document.getElementById('search-update-status');
+        statusEl.textContent = '';
+        try {
+          const { error: updateErr } = await supabase.from('cleansrilankadb').update({ status, note }).eq('id', r.id);
+          if(updateErr){
+            statusEl.textContent = 'Update failed: ' + updateErr.message;
+            statusEl.style.color = 'crimson';
+            return;
+          }
+          statusEl.textContent = 'Updated';
+          statusEl.style.color = 'green';
+        } catch(err){
+          statusEl.textContent = 'Update failed: ' + err.message;
+          statusEl.style.color = 'crimson';
+        }
+      };
+    } catch(err) {
+      resultEl.innerHTML = '<div style="color:crimson;font-weight:500;">Search failed: ' + err.message + '</div>';
+    }
+  });
+
+  document.getElementById('filter-all').addEventListener('click', async function() {
+    document.getElementById('search-input').value = '';
+    document.getElementById('search-update-form').style.display = 'none';
+    const resultEl = document.getElementById('search-result');
+    resultEl.innerHTML = '<span>Loading...</span>';
+    try {
+      const { data, error } = await supabase.from('cleansrilankadb').select('*').order('token', { ascending: true });
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        resultEl.innerHTML = '<span>No data found.</span>';
+        return;
+      }
+      // Render all results with expanded details
+      resultEl.innerHTML = data.map(r => {
+        return `<div style='margin-bottom:18px;padding:14px;background:#f7f7f7;border-radius:8px;'>
+          <div><strong>Token No:</strong> ${r.token}</div>
+          <div><strong>Name:</strong> ${r.name}</div>
+          <div><strong>NIC:</strong> ${r.nic || '-'}</div>
+          <div><strong>Phone:</strong> ${r.phone || '-'}</div>
+          <div><strong>Address:</strong> ${r.address || '-'}</div>
+          <div><strong>Problem:</strong> ${r.problem || '-'}</div>
+          <div><strong>Status:</strong> ${r.status || '-'}</div>
+          <div><strong>Note:</strong> ${r.note || '-'}</div>
+        </div>`;
+      }).join('');
+    } catch (err) {
+      resultEl.innerHTML = `<span style='color:red;'>Error: ${err.message}</span>`;
+    }
+  });
+}
+
 // Initialize UI on load
 document.addEventListener('DOMContentLoaded', async ()=>{
   showSection('home');
   await fetchSummaryAndRender();
+  // Attach All button handler after DOM is ready and Supabase is initialized
+  const allBtn = document.getElementById('filter-all');
+  if (allBtn) {
+    allBtn.addEventListener('click', async function() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('search-update-form').style.display = 'none';
+      const resultEl = document.getElementById('search-result');
+      resultEl.innerHTML = '<span>Loading...</span>';
+      try {
+        const { data, error } = await supabase.from('cleansrilankadb').select('*').order('token', { ascending: true });
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          resultEl.innerHTML = '<span>No data found.</span>';
+          return;
+        }
+        resultEl.innerHTML = data.map(r => {
+          return `<div style='margin-bottom:18px;padding:14px;background:#f7f7f7;border-radius:8px;'>
+            <div><strong>Token No:</strong> ${r.token}</div>
+            <div><strong>Name:</strong> ${r.name}</div>
+            <div><strong>NIC:</strong> ${r.nic || '-'}</div>
+            <div><strong>Phone:</strong> ${r.phone || '-'}</div>
+            <div><strong>Address:</strong> ${r.address || '-'}</div>
+            <div><strong>Problem:</strong> ${r.problem || '-'}</div>
+            <div><strong>Status:</strong> ${r.status || '-'}</div>
+            <div><strong>Note:</strong> ${r.note || '-'}</div>
+          </div>`;
+        }).join('');
+      } catch (err) {
+        resultEl.innerHTML = `<span style='color:red;'>Error: ${err.message}</span>`;
+      }
+    });
+  }
   // refresh summary periodically (optional)
 });
