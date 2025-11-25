@@ -257,7 +257,6 @@ button:disabled{opacity:.6;cursor:default}
 }
 footer {
   flex-shrink: 0;
-  position: relative;
   width: 100%;
   background: #111;
   color: #fff;
@@ -266,6 +265,8 @@ footer {
   font-size: 1.05em;
   letter-spacing: 0.5px;
   margin-top: auto;
+  position: relative;
+  border-radius: 0;
 }
 @media (max-width: 700px) {
   body {
@@ -330,10 +331,11 @@ footer {
     width: 100vw;
     left: 0;
     right: 0;
-    position: fixed;
+    position: relative;
     bottom: 0;
     z-index: 10;
     border-radius: 0;
+    margin-top: auto;
   }
   #diagnostics {
     width: 100vw;
@@ -349,7 +351,7 @@ footer {
     text-align: center;
   }
   body {
-    padding-bottom: 56px;
+    padding-bottom: 0;
     padding-top: 44px;
   }
   .logo {
