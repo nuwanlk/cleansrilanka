@@ -4,14 +4,17 @@ try{
   if(typeof supabasejs !== 'undefined' && supabasejs && typeof supabasejs.createClient === 'function'){
     supabase = supabasejs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } else if(typeof supabase !== 'undefined' && supabase && typeof supabase.createClient === 'function'){
-    // some builds expose a `supabase` namespace
     supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } else if(typeof createClient === 'function'){
     supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } else if(window && window.supabase && typeof window.supabase.createClient === 'function'){
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } else {
+    setDiag('Supabase client not found. Check CDN and config.js.', false);
     console.error('Supabase client not found. Make sure the supabase-js CDN is loaded.');
   }
 }catch(err){
+  setDiag('Error initializing Supabase client', false);
   console.error('Error initializing Supabase client', err);
 }
 
@@ -20,6 +23,16 @@ function setStatus(el, msg, success=true){
   el.textContent = msg;
   el.style.color = success ? 'green' : 'crimson';
   setTimeout(()=> el.textContent='', 4000);
+}
+
+// Show/hide diagnostics banner
+function setDiag(msg, success=true){
+  const diag = document.getElementById('diagnostics');
+  if(!diag) return;
+  diag.textContent = msg;
+  diag.style.display = msg ? 'block' : 'none';
+  diag.style.background = success ? '#e0ffe0' : '#ffe0e0';
+  diag.style.color = success ? '#006400' : '#b00020';
 }
 
 // Simple view toggling: 'home', 'insert', 'search', 'detail'
@@ -39,10 +52,35 @@ function showSection(name){
 // Chart instance
 let summaryChart = null;
 
+function isSupabaseConfigured() {
+  let diagMsg = '';
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    diagMsg = 'Supabase URL or anon key missing.';
+    setDiag(diagMsg, false);
+    return false;
+  }
+  if (!supabase || typeof supabase.from !== 'function') {
+    diagMsg = 'Supabase client not initialized.';
+    setDiag(diagMsg, false);
+    return false;
+  }
+  return true;
+}
+
 async function fetchSummaryAndRender(){
+  if (!isSupabaseConfigured()) {
+    return;
+  }
+  let dbConnected = false;
   try{
-    const { data, error } = await supabase.from('reports').select('*');
-    if(error){ console.error('Summary fetch error', error); return; }
+    const { data, error } = await supabase.from('cleansrilankadb').select('*');
+    if(error){
+      setDiag('Database connection failed: ' + error.message, false);
+      console.error('Summary fetch error', error);
+      return;
+    }
+    dbConnected = true;
+    setDiag('Database is connected', true);
     const total = data.length;
     const counts = data.reduce((acc, r)=>{ const s = r.status || 'unknown'; acc[s] = (acc[s]||0)+1; return acc; }, {});
     const labels = Object.keys(counts);
@@ -54,7 +92,10 @@ async function fetchSummaryAndRender(){
       data: { labels, datasets: [{ label: 'Reports', data: values, backgroundColor: '#2b7a78' }] },
       options: { responsive: true, maintainAspectRatio: false }
     });
-  }catch(err){ console.error(err); }
+  }catch(err){
+    setDiag('Database connection failed: ' + err.message, false);
+    console.error(err);
+  }
 }
 
 // Insert new report
@@ -71,12 +112,12 @@ document.getElementById('entry-form').addEventListener('submit', async (e)=>{
 
   // Check duplicate token
   try{
-    const { data: existing, error: checkErr } = await supabase.from('reports').select('id').eq('token', token).limit(1);
+    const { data: existing, error: checkErr } = await supabase.from('cleansrilankadb').select('id').eq('token', token).limit(1);
     if(checkErr){ setStatus(statusEl, 'Error checking token: ' + checkErr.message, false); console.error(checkErr); return; }
     if(existing && existing.length > 0){ setStatus(statusEl, 'Token already added', false); return; }
   }catch(err){ console.error('Token check failed', err); setStatus(statusEl, 'Token check failed', false); return; }
 
-  const { data, error } = await supabase.from('reports').insert([{ token, nic, phone, name, address, problem, status: 'new' }]).select();
+  const { data, error } = await supabase.from('cleansrilankadb').insert([{ token, nic, phone, name, address, problem, status: 'new' }]).select();
   if(error){ setStatus(statusEl, 'Error: ' + error.message, false); console.error(error); return; }
   setStatus(statusEl, 'Saved');
   document.getElementById('entry-form').reset();
@@ -93,7 +134,10 @@ if(gotoInsertBtn) gotoInsertBtn.addEventListener('click', ()=>{ showSection('ins
 if(gotoSearchBtn) gotoSearchBtn.addEventListener('click', async ()=>{ showSection('search'); await performSearch(''); });
 // Top-left Home button
 const topHomeBtn = document.getElementById('top-home-btn');
-if(topHomeBtn) topHomeBtn.addEventListener('click', async ()=>{ showSection('home'); await fetchSummaryAndRender(); });
+if(topHomeBtn) topHomeBtn.addEventListener('click', async ()=>{
+  showSection('home');
+  await fetchSummaryAndRender();
+});
 
 async function performSearch(query=''){
   const q = (query === undefined || query === null) ? document.getElementById('search-input').value.trim() : query.trim();
@@ -103,10 +147,10 @@ async function performSearch(query=''){
   try{
     let res;
     if(!q){
-      res = await supabase.from('reports').select('*').order('created_at', { ascending: false });
+      res = await supabase.from('cleansrilankadb').select('*').order('created_at', { ascending: false });
     } else {
       const pattern = `%${q}%`;
-      res = await supabase.from('reports').select('*').or(`nic.ilike.${pattern},phone.ilike.${pattern},name.ilike.${pattern},token.ilike.${pattern}`);
+      res = await supabase.from('cleansrilankadb').select('*').or(`nic.ilike.${pattern},phone.ilike.${pattern},name.ilike.${pattern},token.ilike.${pattern}`);
     }
     const { data, error } = res;
     if(error){ resultsEl.innerHTML = `<li class="status">Error: ${error.message}</li>`; return; }

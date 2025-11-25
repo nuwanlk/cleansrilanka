@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <!-- Diagnostics banner -->
+    <div id="diagnostics" style="width:100%;text-align:center;padding:6px 0;font-weight:bold;display:none;"></div>
     <!-- Top-left Home button -->
     <button id="top-home-btn" class="top-home" title="Home" aria-label="Home">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -79,7 +81,7 @@
     </main>
 
     <!-- Supabase JS client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
     <!-- Chart.js for summary graph -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- User-supplied config (edit with your keys) -->
