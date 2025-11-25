@@ -149,20 +149,26 @@ async function performSearch(query=''){
     if(!q){
       res = await supabase.from('cleansrilankadb').select('*').order('created_at', { ascending: false });
     } else {
-      const pattern = `%${q}%`;
-      res = await supabase.from('cleansrilankadb').select('*').or(`nic.ilike.${pattern},phone.ilike.${pattern},name.ilike.${pattern},token.ilike.${pattern}`);
+      // Search by NIC, phone, or name
+      res = await supabase.from('cleansrilankadb').select('*').or(`nic.ilike.%${q}%,phone.ilike.%${q}%,name.ilike.%${q}%`).order('created_at', { ascending: false });
     }
-    const { data, error } = res;
-    if(error){ resultsEl.innerHTML = `<li class="status">Error: ${error.message}</li>`; return; }
-    if(!data || data.length===0){ resultsEl.innerHTML = '<li class="status">No results</li>'; return; }
-    data.forEach(r => {
+    if(res.error){
+      setDiag('Search failed: ' + res.error.message, false);
+      return;
+    }
+    const data = res.data || [];
+    if(data.length === 0){ resultsEl.innerHTML = '<li>No results found</li>'; return; }
+    data.forEach(r=>{
       const li = document.createElement('li');
-      li.textContent = `${r.token || ''} — ${r.name} — ${r.nic || ''} — ${r.phone || ''}`;
-      li.dataset.id = r.id;
+      li.textContent = `${r.token} - ${r.name} (${r.status || 'new'})`;
+      li.className = 'result-item';
       li.addEventListener('click', ()=> showDetail(r));
       resultsEl.appendChild(li);
     });
-  }catch(err){ resultsEl.innerHTML = `<li class="status">Error: ${err.message}</li>`; }
+  }catch(err){
+    setDiag('Search failed: ' + err.message, false);
+    console.error(err);
+  }
 }
 
 // show detail and populate update form
@@ -187,17 +193,16 @@ function showDetail(r){
 // Update status/note
 document.getElementById('update-form').addEventListener('submit', async (e)=>{
   e.preventDefault();
-  if(!currentRecord){ alert('Select a report first'); return; }
+  if(!currentRecord) return;
   const status = document.getElementById('status').value;
   const note = document.getElementById('note').value.trim();
-  const stEl = document.getElementById('update-status');
-  if(!status){ setStatus(stEl,'Choose a status',false); return; }
-
-  const { data, error } = await supabase.from('reports').update({ status, note, updated_at: new Date().toISOString() }).eq('id', currentRecord.id).select();
-  if(error){ setStatus(stEl,'Error: ' + error.message,false); console.error(error); return; }
-  setStatus(stEl,'Updated');
-  // refresh detail view from returned data
-  if(data && data[0]){ showDetail(data[0]); }
+  const updateStatusEl = document.getElementById('update-status');
+  try{
+    const { data, error } = await supabase.from('cleansrilankadb').update({ status, note, updated_at: new Date().toISOString() }).eq('id', currentRecord.id).select();
+    if(error){ updateStatusEl.textContent = 'Update failed: ' + error.message; updateStatusEl.style.color = 'crimson'; return; }
+    updateStatusEl.textContent = 'Updated'; updateStatusEl.style.color = 'green';
+    await performSearch();
+  }catch(err){ updateStatusEl.textContent = 'Update failed: ' + err.message; updateStatusEl.style.color = 'crimson'; }
 });
 
 // Initialize UI on load

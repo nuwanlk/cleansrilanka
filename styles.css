@@ -27,6 +27,22 @@ button:disabled{opacity:.6;cursor:default}
 .home-grid{display:flex;gap:16px;align-items:center}
 .chart-wrap{flex:1;min-width:220px}
 .home-actions{display:flex;flex-direction:column;gap:12px;width:220px}
+.home-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 24px;
+  width: 100%;
+  text-align: center;
+  flex-direction: row;
+}
+@media (max-width: 600px) {
+  .home-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
 .big{padding:14px 18px;font-size:16px;border-radius:8px}
 
 
