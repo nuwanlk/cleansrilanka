@@ -45,4 +45,39 @@ button:disabled{opacity:.6;cursor:default}
 }
 .big{padding:14px 18px;font-size:16px;border-radius:8px}
 
+#dashboard-stats {
+  font-size: 2.2em;
+  font-weight: 600;
+  gap: 32px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+#dashboard-stats div {
+  min-width: 120px;
+}
+@media (max-width: 600px) {
+  #dashboard-stats {
+    font-size: 1.5em;
+    flex-direction: column;
+    gap: 14px;
+  }
+  #dashboard-stats div {
+    min-width: 0;
+  }
+}
+
+.logo-img {
+  height: 80px;
+  width: auto;
+  max-width: 140px;
+}
+@media (max-width: 600px) {
+  .logo-img {
+    height: 48px;
+    max-width: 80px;
+  }
+}
+
 
