@@ -272,6 +272,15 @@ footer {
     font-size: 1em;
     padding: 0;
   }
+  .card {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 10px 2vw !important;
+  }
   #main-content, .card {
     padding: 8px 2vw !important;
     margin: 0 !important;
@@ -322,6 +331,43 @@ footer {
   .logo {
     max-width: 120px;
     height: auto;
+  }
+  #insert-card label,
+  #search-card label {
+    font-size: 1em;
+    margin-bottom: 2px;
+  }
+  #insert-card input,
+  #insert-card textarea,
+  #insert-card select,
+  #search-card input,
+  #search-card textarea,
+  #search-card select {
+    width: 100% !important;
+    font-size: 1em;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+  }
+  #insert-card button,
+  #search-card button {
+    width: 100%;
+    font-size: 1em;
+    margin-bottom: 10px;
+    padding: 10px 0;
+  }
+  #search-card .big {
+    width: 100%;
+    font-size: 1em;
+    margin-bottom: 8px;
+    padding: 10px 0;
+  }
+  #search-card > div[style*="display:flex"] {
+    flex-direction: column;
+    gap: 8px;
+  }
+  #search-result {
+    padding: 0;
+    margin: 0;
   }
 }
 
