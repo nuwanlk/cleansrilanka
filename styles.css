@@ -9,7 +9,43 @@ input[type=text],textarea,select{width:100%;padding:8px;border:1px solid #ddd;bo
 .actions{display:flex;align-items:center;gap:12px;margin-top:10px}
 button{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer}
 button:disabled{opacity:.6;cursor:default}
-.search-row{display:flex;gap:8px}
+.search-row{
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+  justify-content: center;
+}
+#search-input{
+  padding: 10px 14px;
+  border: 1.5px solid #b2bec3;
+  border-radius: 6px;
+  font-size: 1.1em;
+  background: #f7f7f7;
+  transition: border-color 0.2s;
+  width: 240px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+#search-input:focus{
+  border-color: #2b7a78;
+  outline: none;
+}
+#search-btn{
+  background: #2b7a78;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 24px;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+  transition: background 0.2s;
+}
+#search-btn:hover{
+  background: #205072;
+}
 #results{list-style:none;padding:0;margin-top:10px}
 #results li{padding:8px;border:1px solid #eee;border-radius:6px;margin-bottom:6px;cursor:pointer}
 .status{font-size:13px;color:var(--muted)}

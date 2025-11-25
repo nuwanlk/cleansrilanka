@@ -58,12 +58,24 @@
       <section id="search-card" class="card">
         <h2>Search Reports</h2>
         <div class="search-row">
-          <input id="search-input" placeholder="Search by NIC, phone or name" />
-          <div style="display:flex;gap:8px;align-items:center">
-            <button id="search-btn">Search</button>
-          </div>
+          <input id="search-input" placeholder="Enter Token No" />
+          <button id="search-btn">Search</button>
         </div>
-        <ul id="results"></ul>
+        <div id="search-result" style="margin-top:18px;"></div>
+        <form id="search-update-form" style="display:none;margin-top:18px;">
+          <label>Status
+            <select id="search-status">
+              <option value="">-- choose --</option>
+              <option value="solved">Solved</option>
+              <option value="not solved">Not Solved</option>
+            </select>
+          </label>
+          <label>Note
+            <textarea id="search-note" rows="2" style="width:100%;"></textarea>
+          </label>
+          <button type="submit" style="margin-top:10px;">Update</button>
+          <span id="search-update-status" class="status"></span>
+        </form>
       </section>
 
       <section id="login-card" class="card" style="display:none;max-width:350px;margin:32px auto;">
