@@ -215,62 +215,59 @@ document.getElementById('search-btn').addEventListener('click', async () => {
       resultEl.innerHTML = '<div style="color:crimson;font-weight:500;">No results found</div>';
       return;
     }
-    // Show result, clickable for expansion
+    // Show result and expanded details immediately
     const r = data[0];
     const summary = document.createElement('div');
     summary.style.padding = '12px 0';
     summary.style.fontSize = '1.2em';
     summary.style.color = '#205072';
-    summary.style.cursor = 'pointer';
     summary.innerHTML = `<strong>${r.token}</strong> - ${r.name} (${r.status || 'new'})`;
     resultEl.appendChild(summary);
-    summary.addEventListener('click', () => {
-      // Expand and show all related data
-      const expanded = document.createElement('div');
-      expanded.style.marginTop = '10px';
-      expanded.style.background = '#f7f7f7';
-      expanded.style.borderRadius = '8px';
-      expanded.style.padding = '14px';
-      expanded.innerHTML = `
-        <div><strong>Token No:</strong> ${r.token}</div>
-        <div><strong>Name:</strong> ${r.name}</div>
-        <div><strong>NIC:</strong> ${r.nic || '-'}</div>
-        <div><strong>Phone:</strong> ${r.phone || '-'}</div>
-        <div><strong>Address:</strong> ${r.address || '-'}</div>
-        <div><strong>Problem:</strong> ${r.problem || '-'}</div>
-        <div><strong>Status:</strong> ${r.status || '-'}</div>
-        <div><strong>Note:</strong> ${r.note || '-'}</div>
-      `;
-      // Remove previous expanded if any
-      const prev = resultEl.querySelector('.expanded-details');
-      if(prev) prev.remove();
-      expanded.className = 'expanded-details';
-      resultEl.appendChild(expanded);
-      // Show update form and populate fields
-      updateForm.style.display = 'block';
-      document.getElementById('search-status').value = r.status || '';
-      document.getElementById('search-note').value = r.note || '';
-      updateForm.onsubmit = async function(e){
-        e.preventDefault();
-        const status = document.getElementById('search-status').value;
-        const note = document.getElementById('search-note').value.trim();
-        const statusEl = document.getElementById('search-update-status');
-        statusEl.textContent = '';
-        try {
-          const { error: updateErr } = await supabase.from('cleansrilankadb').update({ status, note }).eq('id', r.id);
-          if(updateErr){
-            statusEl.textContent = 'Update failed: ' + updateErr.message;
-            statusEl.style.color = 'crimson';
-            return;
-          }
-          statusEl.textContent = 'Updated';
-          statusEl.style.color = 'green';
-        } catch(err){
-          statusEl.textContent = 'Update failed: ' + err.message;
+    // Expand and show all related data
+    const expanded = document.createElement('div');
+    expanded.style.marginTop = '10px';
+    expanded.style.background = '#f7f7f7';
+    expanded.style.borderRadius = '8px';
+    expanded.style.padding = '14px';
+    expanded.innerHTML = `
+      <div><strong>Token No:</strong> ${r.token}</div>
+      <div><strong>Name:</strong> ${r.name}</div>
+      <div><strong>NIC:</strong> ${r.nic || '-'}</div>
+      <div><strong>Phone:</strong> ${r.phone || '-'}</div>
+      <div><strong>Address:</strong> ${r.address || '-'}</div>
+      <div><strong>Problem:</strong> ${r.problem || '-'}</div>
+      <div><strong>Status:</strong> ${r.status || '-'}</div>
+      <div><strong>Note:</strong> ${r.note || '-'}</div>
+    `;
+    // Remove previous expanded if any
+    const prev = resultEl.querySelector('.expanded-details');
+    if(prev) prev.remove();
+    expanded.className = 'expanded-details';
+    resultEl.appendChild(expanded);
+    // Show update form and populate fields
+    updateForm.style.display = 'block';
+    document.getElementById('search-status').value = r.status || '';
+    document.getElementById('search-note').value = r.note || '';
+    updateForm.onsubmit = async function(e){
+      e.preventDefault();
+      const status = document.getElementById('search-status').value;
+      const note = document.getElementById('search-note').value.trim();
+      const statusEl = document.getElementById('search-update-status');
+      statusEl.textContent = '';
+      try {
+        const { error: updateErr } = await supabase.from('cleansrilankadb').update({ status, note }).eq('id', r.id);
+        if(updateErr){
+          statusEl.textContent = 'Update failed: ' + updateErr.message;
           statusEl.style.color = 'crimson';
+          return;
         }
-      };
-    });
+        statusEl.textContent = 'Updated';
+        statusEl.style.color = 'green';
+      } catch(err){
+        statusEl.textContent = 'Update failed: ' + err.message;
+        statusEl.style.color = 'crimson';
+      }
+    };
   } catch(err) {
     resultEl.innerHTML = '<div style="color:crimson;font-weight:500;">Search failed: ' + err.message + '</div>';
   }

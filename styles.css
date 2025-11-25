@@ -179,4 +179,50 @@ button:disabled{opacity:.6;cursor:default}
   font-weight: 500;
 }
 
+/* Insert Data Form Styling */
+#insert-card input[type="text"],
+#insert-card input[type="number"],
+#insert-card textarea,
+#insert-card select {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 8px 0 16px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #f8f9fa;
+  transition: border-color 0.2s;
+}
+#insert-card input[type="text"]:focus,
+#insert-card input[type="number"]:focus,
+#insert-card textarea:focus,
+#insert-card select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+#insert-card label {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+  display: block;
+}
+#insert-card button[type="submit"] {
+  background: linear-gradient(90deg, #007bff 60%, #00c6ff 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 28px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+#insert-card button[type="submit"]:hover {
+  background: linear-gradient(90deg, #0056b3 60%, #007bff 100%);
+  transform: translateY(-2px) scale(1.03);
+}
+
 
