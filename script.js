@@ -82,6 +82,17 @@ async function fetchSummaryAndRender(){
     dbConnected = true;
     setDiag('Database is connected', true);
     const total = data.length;
+    const solved = data.filter(r => r.status === 'solved').length;
+    const notSolved = data.filter(r => r.status === 'not solved').length;
+    // Update dashboard stats
+    const statsEl = document.getElementById('dashboard-stats');
+    if(statsEl){
+      statsEl.innerHTML = `
+        <div><strong>මුළු ගැටළු සංඛ්‍යාව</strong><br>${total}</div>
+        <div><strong>විසඳන ලද සංඛ්‍යාව</strong><br>${solved}</div>
+        <div><strong>නොවිසඳුණු ගැටළු සංඛ්‍යාව</strong><br>${notSolved}</div>
+      `;
+    }
     const counts = data.reduce((acc, r)=>{ const s = r.status || 'unknown'; acc[s] = (acc[s]||0)+1; return acc; }, {});
     const labels = Object.keys(counts);
     const values = labels.map(l => counts[l]);
@@ -126,6 +137,8 @@ document.getElementById('entry-form').addEventListener('submit', async (e)=>{
 // Search
 document.getElementById('search-btn').addEventListener('click', ()=> performSearch());
 document.getElementById('search-input').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); performSearch(); }});
+// Remove live search while typing
+// document.getElementById('search-input').addEventListener('input', ()=> performSearch());
 
 // Navigation buttons from home
 const gotoInsertBtn = document.getElementById('goto-insert');
@@ -143,20 +156,26 @@ async function performSearch(query=''){
   const q = (query === undefined || query === null) ? document.getElementById('search-input').value.trim() : query.trim();
   const resultsEl = document.getElementById('results');
   resultsEl.innerHTML = '';
-  // if no query provided, fetch all
   try{
     let res;
     if(!q){
       res = await supabase.from('cleansrilankadb').select('*').order('created_at', { ascending: false });
     } else {
-      // Search by NIC, phone, or name
-      res = await supabase.from('cleansrilankadb').select('*').or(`nic.ilike.%${q}%,phone.ilike.%${q}%,name.ilike.%${q}%`).order('created_at', { ascending: false });
+      // Search by token or name, match whole text
+      res = await supabase.from('cleansrilankadb').select('*').or(`token.ilike.%${q}%,name.ilike.%${q}%`).order('created_at', { ascending: false });
     }
     if(res.error){
       setDiag('Search failed: ' + res.error.message, false);
       return;
     }
-    const data = res.data || [];
+    let data = res.data || [];
+    // Deduplicate by unique id
+    const seenIds = new Set();
+    data = data.filter(r => {
+      if(seenIds.has(r.id)) return false;
+      seenIds.add(r.id);
+      return true;
+    });
     if(data.length === 0){ resultsEl.innerHTML = '<li>No results found</li>'; return; }
     data.forEach(r=>{
       const li = document.createElement('li');
