@@ -267,5 +267,62 @@ footer {
   letter-spacing: 0.5px;
   margin-top: auto;
 }
+@media (max-width: 700px) {
+  body {
+    font-size: 1em;
+    padding: 0;
+  }
+  #main-content, .card {
+    padding: 8px 2vw !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  #dashboard-stats {
+    flex-direction: column;
+    gap: 10px;
+  }
+  #dashboard-stats > div {
+    font-size: 1em;
+    padding: 12px 6px;
+  }
+  .search-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .search-row input, .search-row button {
+    width: 100%;
+    font-size: 1em;
+  }
+  #insert-card input[type="text"],
+  #insert-card input[type="number"],
+  #insert-card textarea,
+  #insert-card select {
+    font-size: 1em;
+    padding: 8px 10px;
+  }
+  #insert-card button[type="submit"] {
+    width: 100%;
+    font-size: 1em;
+    padding: 10px 0;
+  }
+  #search-card .big {
+    font-size: 1em;
+    padding: 10px 0;
+    width: 100%;
+  }
+  #search-card > div[style*="display:flex"] {
+    flex-direction: column;
+    gap: 8px;
+  }
+  footer {
+    font-size: 0.95em;
+    padding: 12px 0 6px 0;
+  }
+  .logo {
+    max-width: 120px;
+    height: auto;
+  }
+}
 
 
