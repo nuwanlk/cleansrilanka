@@ -45,7 +45,20 @@ function showSection(name){
   const all = [home, insert, search, detail, login];
   all.forEach(el=>{ if(!el) return; el.style.display = 'none'; });
   if(name === 'home' && home) home.style.display = 'block';
-  if(name === 'insert' && insert) insert.style.display = 'block';
+  if(name === 'insert' && insert) {
+    insert.style.display = 'block';
+    // Fetch and show last token number
+    const lastTokenRow = document.getElementById('last-token-row');
+    lastTokenRow.textContent = 'Loading last token...';
+    supabase.from('cleansrilankadb').select('token').order('id', { ascending: false }).limit(1)
+      .then(({ data, error }) => {
+        if(error || !data || data.length === 0) {
+          lastTokenRow.textContent = 'Last token not found.';
+        } else {
+          lastTokenRow.textContent = 'Last token No: ' + data[0].token;
+        }
+      });
+  }
   if(name === 'search' && search) search.style.display = 'block';
   if(name === 'detail' && detail) detail.style.display = 'block';
   if(name === 'login' && login) login.style.display = 'block';
