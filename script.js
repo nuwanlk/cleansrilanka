@@ -58,6 +58,32 @@ function showSection(name){
           lastTokenRow.textContent = 'Last token No: ' + data[0].token;
         }
       });
+    // Fetch institute list and populate dropdown
+    const instituteSelect = document.getElementById('institute');
+    if (instituteSelect) {
+      instituteSelect.innerHTML = '<option value="">-- ආයතනය තෝරන්න / Select Institute --</option>';
+      supabase.from('institutelist').select('institute').order('institute', { ascending: true })
+        .then(({ data, error }) => {
+          if (error) {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = 'Institute list fetch error';
+            instituteSelect.appendChild(opt);
+          } else if (!data || data.length === 0) {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = 'No institutes found';
+            instituteSelect.appendChild(opt);
+          } else {
+            data.forEach(inst => {
+              const opt = document.createElement('option');
+              opt.value = inst.institute;
+              opt.textContent = inst.institute;
+              instituteSelect.appendChild(opt);
+            });
+          }
+        });
+    }
   }
   if(name === 'search' && search) search.style.display = 'block';
   if(name === 'detail' && detail) detail.style.display = 'block';
@@ -133,8 +159,9 @@ document.getElementById('entry-form').addEventListener('submit', async (e)=>{
   const name = document.getElementById('name').value.trim();
   const address = document.getElementById('address').value.trim();
   const problem = document.getElementById('problem').value.trim();
+  const institute = document.getElementById('institute').value.trim();
   const statusEl = document.getElementById('entry-status');
-  if(!token || !name || !address || !problem){ setStatus(statusEl,'Please fill required fields',false); return; }
+  if(!token || !name || !address || !problem || !institute){ setStatus(statusEl,'Please fill required fields',false); return; }
 
   // Check duplicate token
   try{
@@ -143,7 +170,7 @@ document.getElementById('entry-form').addEventListener('submit', async (e)=>{
     if(existing && existing.length > 0){ setStatus(statusEl, 'Token already added', false); return; }
   }catch(err){ console.error('Token check failed', err); setStatus(statusEl, 'Token check failed', false); return; }
 
-  const { data, error } = await supabase.from('cleansrilankadb').insert([{ token, nic, phone, name, address, problem, status: 'new' }]).select();
+  const { data, error } = await supabase.from('cleansrilankadb').insert([{ token, nic, phone, name, address, problem, institute, status: 'new' }]).select();
   if(error){ setStatus(statusEl, 'Error: ' + error.message, false); console.error(error); return; }
   setStatus(statusEl, 'Saved');
   document.getElementById('entry-form').reset();
@@ -247,6 +274,7 @@ document.getElementById('search-btn').addEventListener('click', async () => {
       <div><strong>NIC:</strong> ${r.nic || '-'}</div>
       <div><strong>Phone:</strong> ${r.phone || '-'}</div>
       <div><strong>Address:</strong> ${r.address || '-'}</div>
+      <div><strong>Institute:</strong> ${r.institute || '-'}</div>
       <div><strong>Problem:</strong> ${r.problem || '-'}</div>
       <div><strong>Status:</strong> ${r.status || '-'}</div>
       <div><strong>Note:</strong> ${r.note || '-'}</div>
@@ -360,6 +388,7 @@ function attachHandlers() {
         <div><strong>NIC:</strong> ${r.nic || '-'}</div>
         <div><strong>Phone:</strong> ${r.phone || '-'}</div>
         <div><strong>Address:</strong> ${r.address || '-'}</div>
+        <div><strong>Institute:</strong> ${r.institute || '-'}</div>
         <div><strong>Problem:</strong> ${r.problem || '-'}</div>
         <div><strong>Status:</strong> ${r.status || '-'}</div>
         <div><strong>Note:</strong> ${r.note || '-'}</div>
@@ -418,6 +447,7 @@ function attachHandlers() {
           <div><strong>NIC:</strong> ${r.nic || '-'}</div>
           <div><strong>Phone:</strong> ${r.phone || '-'}</div>
           <div><strong>Address:</strong> ${r.address || '-'}</div>
+          <div><strong>Institute:</strong> ${r.institute || '-'}</div>
           <div><strong>Problem:</strong> ${r.problem || '-'}</div>
           <div><strong>Status:</strong> ${r.status || '-'}</div>
           <div><strong>Note:</strong> ${r.note || '-'}</div>
@@ -449,6 +479,7 @@ function attachHandlers() {
             <div><strong>NIC:</strong> ${r.nic || '-'}</div>
             <div><strong>Phone:</strong> ${r.phone || '-'}</div>
             <div><strong>Address:</strong> ${r.address || '-'}</div>
+            <div><strong>Institute:</strong> ${r.institute || '-'}</div>
             <div><strong>Problem:</strong> ${r.problem || '-'}</div>
             <div><strong>Status:</strong> ${r.status || '-'}</div>
             <div><strong>Note:</strong> ${r.note || '-'}</div>
@@ -481,6 +512,7 @@ function attachHandlers() {
             <div><strong>NIC:</strong> ${r.nic || '-'}</div>
             <div><strong>Phone:</strong> ${r.phone || '-'}</div>
             <div><strong>Address:</strong> ${r.address || '-'}</div>
+            <div><strong>Institute:</strong> ${r.institute || '-'}</div>
             <div><strong>Problem:</strong> ${r.problem || '-'}</div>
             <div><strong>Status:</strong> ${r.status || '-'}</div>
             <div><strong>Note:</strong> ${r.note || '-'}</div>
@@ -513,6 +545,7 @@ function attachHandlers() {
             <div><strong>NIC:</strong> ${r.nic || '-'}</div>
             <div><strong>Phone:</strong> ${r.phone || '-'}</div>
             <div><strong>Address:</strong> ${r.address || '-'}</div>
+            <div><strong>Institute:</strong> ${r.institute || '-'}</div>
             <div><strong>Problem:</strong> ${r.problem || '-'}</div>
             <div><strong>Status:</strong> ${r.status || '-'}</div>
             <div><strong>Note:</strong> ${r.note || '-'}</div>
@@ -523,9 +556,10 @@ function attachHandlers() {
       }
     });
   }
-  // Attach Export to Excel button handler
+  // Attach Export to Excel button handler (only once)
   const exportBtn = document.getElementById('export-excel');
-  if (exportBtn) {
+  if (exportBtn && !exportBtn._handlerAttached) {
+    exportBtn._handlerAttached = true;
     exportBtn.addEventListener('click', async function() {
       exportBtn.disabled = true;
       exportBtn.textContent = 'Exporting...';
@@ -539,7 +573,7 @@ function attachHandlers() {
           return;
         }
         // Convert data to CSV with UTF-8 BOM for Excel compatibility
-        const headers = Object.keys(data[0]);
+        const headers = Object.keys(data[0] || {token:'',name:'',nic:'',phone:'',address:'',problem:'',status:'',note:''});
         const csvRows = [headers.join(',')];
         data.forEach(row => {
           csvRows.push(headers.map(h => '"' + (row[h] ?? '').toString().replace(/"/g, '""') + '"').join(','));
@@ -547,14 +581,18 @@ function attachHandlers() {
         const csvContent = '\uFEFF' + csvRows.join('\r\n');
         // Download as .csv (Excel compatible)
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'cleansrilanka_export.csv';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        if (window.navigator.msSaveOrOpenBlob) {
+          window.navigator.msSaveOrOpenBlob(blob, 'cleansrilanka_export.csv');
+        } else {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'cleansrilanka_export.csv';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
       } catch (err) {
         alert('Export failed: ' + err.message);
       }
@@ -590,6 +628,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
             <div><strong>NIC:</strong> ${r.nic || '-'}</div>
             <div><strong>Phone:</strong> ${r.phone || '-'}</div>
             <div><strong>Address:</strong> ${r.address || '-'}</div>
+            <div><strong>Institute:</strong> ${r.institute || '-'}</div>
             <div><strong>Problem:</strong> ${r.problem || '-'}</div>
             <div><strong>Status:</strong> ${r.status || '-'}</div>
             <div><strong>Note:</strong> ${r.note || '-'}</div>
@@ -622,6 +661,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
             <div><strong>NIC:</strong> ${r.nic || '-'}</div>
             <div><strong>Phone:</strong> ${r.phone || '-'}</div>
             <div><strong>Address:</strong> ${r.address || '-'}</div>
+            <div><strong>Institute:</strong> ${r.institute || '-'}</div>
             <div><strong>Problem:</strong> ${r.problem || '-'}</div>
             <div><strong>Status:</strong> ${r.status || '-'}</div>
             <div><strong>Note:</strong> ${r.note || '-'}</div>
@@ -654,6 +694,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
             <div><strong>NIC:</strong> ${r.nic || '-'}</div>
             <div><strong>Phone:</strong> ${r.phone || '-'}</div>
             <div><strong>Address:</strong> ${r.address || '-'}</div>
+            <div><strong>Institute:</strong> ${r.institute || '-'}</div>
             <div><strong>Problem:</strong> ${r.problem || '-'}</div>
             <div><strong>Status:</strong> ${r.status || '-'}</div>
             <div><strong>Note:</strong> ${r.note || '-'}</div>
@@ -686,6 +727,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
             <div><strong>NIC:</strong> ${r.nic || '-'}</div>
             <div><strong>Phone:</strong> ${r.phone || '-'}</div>
             <div><strong>Address:</strong> ${r.address || '-'}</div>
+            <div><strong>Institute:</strong> ${r.institute || '-'}</div>
             <div><strong>Problem:</strong> ${r.problem || '-'}</div>
             <div><strong>Status:</strong> ${r.status || '-'}</div>
             <div><strong>Note:</strong> ${r.note || '-'}</div>

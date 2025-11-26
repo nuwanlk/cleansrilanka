@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Report Entry - CleanSriLanka</title>
+    <title>පුද්ගලයින් ලියාපදිංචිය - CleanSriLanka වැලිගම</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -50,6 +50,11 @@
             <label> නම/ Name<span class="req">*</span><input type="text" id="name" required /></label>
             <label> ලිපිනය/ Address<span class="req">*</span><textarea id="address" rows="2" required></textarea></label>
             <label> ගැටළුව/ Problem<span class="req">*</span><textarea id="problem" rows="3" required></textarea></label>
+            <label> යොමු කරන ලද ආයතනය / Institute
+              <select id="institute" required>
+                <option value="">-- ආයතනය තෝරන්න / Select Institute --</option>
+              </select>
+            </label>
             <div class="actions">
               <button type="submit"> තොරතුරු යවන්න</button>
               <span id="entry-status" class="status"></span>
