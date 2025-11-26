@@ -193,7 +193,6 @@ document.getElementById('login-form').addEventListener('submit', async function(
 const gotoInsertBtn = document.getElementById('goto-insert');
 const gotoSearchBtn = document.getElementById('goto-search');
 if(gotoInsertBtn) gotoInsertBtn.addEventListener('click', ()=>{
-  if(!isAuthenticated){ showSection('login'); return; }
   showSection('insert');
 });
 if(gotoSearchBtn) gotoSearchBtn.addEventListener('click', async ()=>{
@@ -492,6 +491,38 @@ function attachHandlers() {
       }
     });
   }
+  // Attach New button handler
+  const newBtn = document.getElementById('filter-new');
+  if (newBtn) {
+    newBtn.addEventListener('click', async function() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('search-update-form').style.display = 'none';
+      const resultEl = document.getElementById('search-result');
+      resultEl.innerHTML = '<span>Loading...</span>';
+      try {
+        const { data, error } = await supabase.from('cleansrilankadb').select('*').eq('status', 'new').order('token', { ascending: true });
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          resultEl.innerHTML = '<span>No data found.</span>';
+          return;
+        }
+        resultEl.innerHTML = data.map(r => {
+          return `<div style='margin-bottom:18px;padding:14px;background:#e3f2fd;border-radius:8px;'>
+            <div><strong>Token No:</strong> ${r.token}</div>
+            <div><strong>Name:</strong> ${r.name}</div>
+            <div><strong>NIC:</strong> ${r.nic || '-'}</div>
+            <div><strong>Phone:</strong> ${r.phone || '-'}</div>
+            <div><strong>Address:</strong> ${r.address || '-'}</div>
+            <div><strong>Problem:</strong> ${r.problem || '-'}</div>
+            <div><strong>Status:</strong> ${r.status || '-'}</div>
+            <div><strong>Note:</strong> ${r.note || '-'}</div>
+          </div>`;
+        }).join('');
+      } catch (err) {
+        resultEl.innerHTML = `<span style='color:red;'>Error: ${err.message}</span>`;
+      }
+    });
+  }
 }
 
 // Initialize UI on load
@@ -579,6 +610,38 @@ document.addEventListener('DOMContentLoaded', async ()=>{
         }
         resultEl.innerHTML = data.map(r => {
           return `<div style='margin-bottom:18px;padding:14px;background:#fffbe6;border-radius:8px;'>
+            <div><strong>Token No:</strong> ${r.token}</div>
+            <div><strong>Name:</strong> ${r.name}</div>
+            <div><strong>NIC:</strong> ${r.nic || '-'}</div>
+            <div><strong>Phone:</strong> ${r.phone || '-'}</div>
+            <div><strong>Address:</strong> ${r.address || '-'}</div>
+            <div><strong>Problem:</strong> ${r.problem || '-'}</div>
+            <div><strong>Status:</strong> ${r.status || '-'}</div>
+            <div><strong>Note:</strong> ${r.note || '-'}</div>
+          </div>`;
+        }).join('');
+      } catch (err) {
+        resultEl.innerHTML = `<span style='color:red;'>Error: ${err.message}</span>`;
+      }
+    });
+  }
+  // Attach New button handler
+  const newBtn = document.getElementById('filter-new');
+  if (newBtn) {
+    newBtn.addEventListener('click', async function() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('search-update-form').style.display = 'none';
+      const resultEl = document.getElementById('search-result');
+      resultEl.innerHTML = '<span>Loading...</span>';
+      try {
+        const { data, error } = await supabase.from('cleansrilankadb').select('*').eq('status', 'new').order('token', { ascending: true });
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          resultEl.innerHTML = '<span>No data found.</span>';
+          return;
+        }
+        resultEl.innerHTML = data.map(r => {
+          return `<div style='margin-bottom:18px;padding:14px;background:#e3f2fd;border-radius:8px;'>
             <div><strong>Token No:</strong> ${r.token}</div>
             <div><strong>Name:</strong> ${r.name}</div>
             <div><strong>NIC:</strong> ${r.nic || '-'}</div>
