@@ -523,6 +523,45 @@ function attachHandlers() {
       }
     });
   }
+  // Attach Export to Excel button handler
+  const exportBtn = document.getElementById('export-excel');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', async function() {
+      exportBtn.disabled = true;
+      exportBtn.textContent = 'Exporting...';
+      try {
+        const { data, error } = await supabase.from('cleansrilankadb').select('*').order('token', { ascending: true });
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          alert('No data to export.');
+          exportBtn.disabled = false;
+          exportBtn.textContent = 'Export to Excel';
+          return;
+        }
+        // Convert data to CSV with UTF-8 BOM for Excel compatibility
+        const headers = Object.keys(data[0]);
+        const csvRows = [headers.join(',')];
+        data.forEach(row => {
+          csvRows.push(headers.map(h => '"' + (row[h] ?? '').toString().replace(/"/g, '""') + '"').join(','));
+        });
+        const csvContent = '\uFEFF' + csvRows.join('\r\n');
+        // Download as .csv (Excel compatible)
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'cleansrilanka_export.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        alert('Export failed: ' + err.message);
+      }
+      exportBtn.disabled = false;
+      exportBtn.textContent = 'Export to Excel';
+    });
+  }
 }
 
 // Initialize UI on load
