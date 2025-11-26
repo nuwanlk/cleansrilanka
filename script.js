@@ -159,7 +159,12 @@ document.getElementById('entry-form').addEventListener('submit', async (e)=>{
   const name = document.getElementById('name').value.trim();
   const address = document.getElementById('address').value.trim();
   const problem = document.getElementById('problem').value.trim();
-  const institute = document.getElementById('institute').value.trim();
+  let institute = '';
+  if (manualInput && manualInput.style.display !== 'none' && manualInput.value.trim()) {
+    institute = manualInput.value.trim();
+  } else {
+    institute = instituteSelect.value.trim();
+  }
   const statusEl = document.getElementById('entry-status');
   if(!token || !name || !address || !problem || !institute){ setStatus(statusEl,'Please fill required fields',false); return; }
 
@@ -174,6 +179,9 @@ document.getElementById('entry-form').addEventListener('submit', async (e)=>{
   if(error){ setStatus(statusEl, 'Error: ' + error.message, false); console.error(error); return; }
   setStatus(statusEl, 'Saved');
   document.getElementById('entry-form').reset();
+  manualInput.style.display = 'none';
+  instituteSelect.disabled = false;
+  manualBtn.textContent = 'Institute not in list?';
 });
 
 // Search
@@ -600,6 +608,25 @@ function attachHandlers() {
       exportBtn.textContent = 'Export to Excel';
     });
   }
+}
+
+// Manual institute entry logic
+const manualBtn = document.getElementById('manual-institute-btn');
+const manualInput = document.getElementById('manual-institute');
+const instituteSelect = document.getElementById('institute');
+if (manualBtn && manualInput && instituteSelect) {
+  manualBtn.addEventListener('click', () => {
+    if (manualInput.style.display === 'none') {
+      manualInput.style.display = 'block';
+      instituteSelect.disabled = true;
+      manualInput.focus();
+      manualBtn.textContent = 'Use dropdown list';
+    } else {
+      manualInput.style.display = 'none';
+      instituteSelect.disabled = false;
+      manualBtn.textContent = 'Institute not in list?';
+    }
+  });
 }
 
 // Initialize UI on load
