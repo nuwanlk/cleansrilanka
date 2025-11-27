@@ -42,7 +42,8 @@ function showSection(name){
   const search = document.getElementById('search-card');
   const detail = document.getElementById('detail-card');
   const login = document.getElementById('login-card');
-  const all = [home, insert, search, detail, login];
+  const admin = document.getElementById('admin-card');
+  const all = [home, insert, search, detail, login, admin];
   all.forEach(el=>{ if(!el) return; el.style.display = 'none'; });
   if(name === 'home' && home) home.style.display = 'block';
   if(name === 'insert' && insert) {
@@ -88,6 +89,7 @@ function showSection(name){
   if(name === 'search' && search) search.style.display = 'block';
   if(name === 'detail' && detail) detail.style.display = 'block';
   if(name === 'login' && login) login.style.display = 'block';
+  if(name === 'admin' && admin) admin.style.display = 'block';
 }
 
 // Chart instance
@@ -227,12 +229,15 @@ document.getElementById('login-form').addEventListener('submit', async function(
 // Navigation buttons from home
 const gotoInsertBtn = document.getElementById('goto-insert');
 const gotoSearchBtn = document.getElementById('goto-search');
+const adminBtn = document.getElementById('new-front-btn');
 if(gotoInsertBtn) gotoInsertBtn.addEventListener('click', ()=>{
   showSection('insert');
 });
 if(gotoSearchBtn) gotoSearchBtn.addEventListener('click', async ()=>{
-  if(!isAuthenticated){ showSection('login'); return; }
   showSection('search'); await performSearch('');
+});
+if(adminBtn) adminBtn.addEventListener('click', ()=>{
+  showSection('admin');
 });
 // Top-left Home button
 const topHomeBtn = document.getElementById('top-home-btn');
@@ -581,13 +586,12 @@ function attachHandlers() {
           return;
         }
         // Convert data to CSV with UTF-8 BOM for Excel compatibility
-        const headers = Object.keys(data[0] || {token:'',name:'',nic:'',phone:'',address:'',problem:'',status:'',note:''});
+        const headers = Object.keys(data[0] || {token:'',name:'',nic:'',phone:'',address:'',institute:'',problem:'',status:'',note:''});
         const csvRows = [headers.join(',')];
         data.forEach(row => {
           csvRows.push(headers.map(h => '"' + (row[h] ?? '').toString().replace(/"/g, '""') + '"').join(','));
         });
         const csvContent = '\uFEFF' + csvRows.join('\r\n');
-        // Download as .csv (Excel compatible)
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         if (window.navigator.msSaveOrOpenBlob) {
           window.navigator.msSaveOrOpenBlob(blob, 'cleansrilanka_export.csv');
@@ -766,4 +770,167 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     });
   }
   // refresh summary periodically (optional)
+  attachAdminHandlers();
 });
+
+// Admin Only page button logic
+function attachAdminHandlers() {
+  const resultEl = document.getElementById('admin-search-result');
+  const allBtn = document.getElementById('filter-all');
+  if (allBtn) {
+    allBtn.addEventListener('click', async function() {
+      resultEl.innerHTML = '<span>Loading...</span>';
+      try {
+        const { data, error } = await supabase.from('cleansrilankadb').select('*').order('token', { ascending: true });
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          resultEl.innerHTML = '<span>No data found.</span>';
+          return;
+        }
+        resultEl.innerHTML = data.map(r => {
+          return `<div style='margin-bottom:18px;padding:14px;background:#f7f7f7;border-radius:8px;'>
+            <div><strong>Token No:</strong> ${r.token}</div>
+            <div><strong>Name:</strong> ${r.name}</div>
+            <div><strong>NIC:</strong> ${r.nic || '-'}</div>
+            <div><strong>Phone:</strong> ${r.phone || '-'}</div>
+            <div><strong>Address:</strong> ${r.address || '-'}</div>
+            <div><strong>Institute:</strong> ${r.institute || '-'}</div>
+            <div><strong>Problem:</strong> ${r.problem || '-'}</div>
+            <div><strong>Status:</strong> ${r.status || '-'}</div>
+            <div><strong>Note:</strong> ${r.note || '-'}</div>
+          </div>`;
+        }).join('');
+      } catch (err) {
+        resultEl.innerHTML = `<span style='color:red;'>Error: ${err.message}</span>`;
+      }
+    });
+  }
+  const solvedBtn = document.getElementById('filter-solved');
+  if (solvedBtn) {
+    solvedBtn.addEventListener('click', async function() {
+      resultEl.innerHTML = '<span>Loading...</span>';
+      try {
+        const { data, error } = await supabase.from('cleansrilankadb').select('*').eq('status', 'solved').order('token', { ascending: true });
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          resultEl.innerHTML = '<span>No data found.</span>';
+          return;
+        }
+        resultEl.innerHTML = data.map(r => {
+          return `<div style='margin-bottom:18px;padding:14px;background:#e6ffe6;border-radius:8px;'>
+            <div><strong>Token No:</strong> ${r.token}</div>
+            <div><strong>Name:</strong> ${r.name}</div>
+            <div><strong>NIC:</strong> ${r.nic || '-'}</div>
+            <div><strong>Phone:</strong> ${r.phone || '-'}</div>
+            <div><strong>Address:</strong> ${r.address || '-'}</div>
+            <div><strong>Institute:</strong> ${r.institute || '-'}</div>
+            <div><strong>Problem:</strong> ${r.problem || '-'}</div>
+            <div><strong>Status:</strong> ${r.status || '-'}</div>
+            <div><strong>Note:</strong> ${r.note || '-'}</div>
+          </div>`;
+        }).join('');
+      } catch (err) {
+        resultEl.innerHTML = `<span style='color:red;'>Error: ${err.message}</span>`;
+      }
+    });
+  }
+  const notSolvedBtn = document.getElementById('filter-not-solved');
+  if (notSolvedBtn) {
+    notSolvedBtn.addEventListener('click', async function() {
+      resultEl.innerHTML = '<span>Loading...</span>';
+      try {
+        const { data, error } = await supabase.from('cleansrilankadb').select('*').eq('status', 'not solved').order('token', { ascending: true });
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          resultEl.innerHTML = '<span>No data found.</span>';
+          return;
+        }
+        resultEl.innerHTML = data.map(r => {
+          return `<div style='margin-bottom:18px;padding:14px;background:#fffbe6;border-radius:8px;'>
+            <div><strong>Token No:</strong> ${r.token}</div>
+            <div><strong>Name:</strong> ${r.name}</div>
+            <div><strong>NIC:</strong> ${r.nic || '-'}</div>
+            <div><strong>Phone:</strong> ${r.phone || '-'}</div>
+            <div><strong>Address:</strong> ${r.address || '-'}</div>
+            <div><strong>Institute:</strong> ${r.institute || '-'}</div>
+            <div><strong>Problem:</strong> ${r.problem || '-'}</div>
+            <div><strong>Status:</strong> ${r.status || '-'}</div>
+            <div><strong>Note:</strong> ${r.note || '-'}</div>
+          </div>`;
+        }).join('');
+      } catch (err) {
+        resultEl.innerHTML = `<span style='color:red;'>Error: ${err.message}</span>`;
+      }
+    });
+  }
+  const newBtn = document.getElementById('filter-new');
+  if (newBtn) {
+    newBtn.addEventListener('click', async function() {
+      resultEl.innerHTML = '<span>Loading...</span>';
+      try {
+        const { data, error } = await supabase.from('cleansrilankadb').select('*').eq('status', 'new').order('token', { ascending: true });
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          resultEl.innerHTML = '<span>No data found.</span>';
+          return;
+        }
+        resultEl.innerHTML = data.map(r => {
+          return `<div style='margin-bottom:18px;padding:14px;background:#e3f2fd;border-radius:8px;'>
+            <div><strong>Token No:</strong> ${r.token}</div>
+            <div><strong>Name:</strong> ${r.name}</div>
+            <div><strong>NIC:</strong> ${r.nic || '-'}</div>
+            <div><strong>Phone:</strong> ${r.phone || '-'}</div>
+            <div><strong>Address:</strong> ${r.address || '-'}</div>
+            <div><strong>Institute:</strong> ${r.institute || '-'}</div>
+            <div><strong>Problem:</strong> ${r.problem || '-'}</div>
+            <div><strong>Status:</strong> ${r.status || '-'}</div>
+            <div><strong>Note:</strong> ${r.note || '-'}</div>
+          </div>`;
+        }).join('');
+      } catch (err) {
+        resultEl.innerHTML = `<span style='color:red;'>Error: ${err.message}</span>`;
+      }
+    });
+  }
+  const exportBtn = document.getElementById('export-excel');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', async function() {
+      exportBtn.disabled = true;
+      exportBtn.textContent = 'Exporting...';
+      try {
+        const { data, error } = await supabase.from('cleansrilankadb').select('*').order('token', { ascending: true });
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          alert('No data to export.');
+          exportBtn.disabled = false;
+          exportBtn.textContent = 'Export to Excel';
+          return;
+        }
+        // Convert data to CSV with UTF-8 BOM for Excel compatibility
+        const headers = Object.keys(data[0] || {token:'',name:'',nic:'',phone:'',address:'',institute:'',problem:'',status:'',note:''});
+        const csvRows = [headers.join(',')];
+        data.forEach(row => {
+          csvRows.push(headers.map(h => '"' + (row[h] ?? '').toString().replace(/"/g, '""') + '"').join(','));
+        });
+        const csvContent = '\uFEFF' + csvRows.join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        if (window.navigator.msSaveOrOpenBlob) {
+          window.navigator.msSaveOrOpenBlob(blob, 'cleansrilanka_export.csv');
+        } else {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'cleansrilanka_export.csv';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+      } catch (err) {
+        alert('Export failed: ' + err.message);
+      }
+      exportBtn.disabled = false;
+      exportBtn.textContent = 'Export to Excel';
+    });
+  }
+}
