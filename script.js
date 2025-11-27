@@ -234,10 +234,11 @@ if(gotoInsertBtn) gotoInsertBtn.addEventListener('click', ()=>{
   showSection('insert');
 });
 if(gotoSearchBtn) gotoSearchBtn.addEventListener('click', async ()=>{
-  
+ 
   showSection('search'); await performSearch('');
 });
 if(adminBtn) adminBtn.addEventListener('click', ()=>{
+   if(!isAuthenticated){ showSection('login'); return; }
   showSection('admin');
 });
 // Top-left Home button
