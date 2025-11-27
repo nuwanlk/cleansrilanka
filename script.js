@@ -133,7 +133,7 @@ async function fetchSummaryAndRender(){
     if(statsEl){
       statsEl.innerHTML = `
         <div><strong>ඉදිරිපත් වූ ගැටළු සංඛ්‍යාව</strong><br>${total}</div>
-        <div><strong>විසඳන ලද සංඛ්‍යාව</strong><br>${solved}</div>
+        <div><strong>විසඳන ලද ගැටළු සංඛ්‍යාව</strong><br>${solved}</div>
         <div><strong>නොවිසඳුණු ගැටළු සංඛ්‍යාව</strong><br>${notSolved}</div>
       `;
     }
