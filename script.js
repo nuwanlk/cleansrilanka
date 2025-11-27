@@ -143,7 +143,16 @@ async function fetchSummaryAndRender(){
         <div style="background:#e3f2fd;color:#1565c0;padding:18px 10px;border-radius:10px;font-size:1.1em;font-weight:500;box-shadow:0 2px 8px rgba(0,0,0,0.07);text-align:center;">
           <strong>විසඳමින් පවතින හෝ අදාල අංශයට ඉදිරිපත් නොවූ ගැටළු</strong><br>${newCount}
         </div>
+        <div id="jobfair-count-card" style="background:#fff3e0;color:#e65100;padding:18px 10px;border-radius:10px;font-size:1.1em;font-weight:500;box-shadow:0 2px 8px rgba(0,0,0,0.07);text-align:center;margin-top:8px;">
+          <strong>රැකියා පොළ සඳහා ලියාපදිංචි වූ ගණන</strong><br><span id="jobfair-count">...</span>
+        </div>
       `;
+      // Fetch jobfair count from Supabase
+      supabase.from('jobfair').select('token', { count: 'exact', head: true })
+        .then(({ count, error }) => {
+          const countEl = document.getElementById('jobfair-count');
+          if(countEl) countEl.textContent = error ? '-' : count;
+        });
     }
     const counts = data.reduce((acc, r)=>{ const s = r.status || 'unknown'; acc[s] = (acc[s]||0)+1; return acc; }, {});
     const labels = Object.keys(counts);
