@@ -234,6 +234,7 @@ if(gotoInsertBtn) gotoInsertBtn.addEventListener('click', ()=>{
   showSection('insert');
 });
 if(gotoSearchBtn) gotoSearchBtn.addEventListener('click', async ()=>{
+  if(!isAuthenticated){ showSection('login'); return; }
   showSection('search'); await performSearch('');
 });
 if(adminBtn) adminBtn.addEventListener('click', ()=>{
