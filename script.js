@@ -159,9 +159,38 @@ async function fetchSummaryAndRender(){
     const values = labels.map(l => counts[l]);
     const ctx = document.getElementById('summaryChart').getContext('2d');
     if(summaryChart) summaryChart.destroy();
+    // Card colors: #e3f2fd (blue), #fff3e0 (orange), #e0ffe0 (green), #ffe0e0 (red)
+    const cardColors = [
+      '#e3f2fd', // blue (new)
+      '#e0ffe0', // green (solved)
+      '#ffe0e0', // red (not solved)
+      '#fff3e0', // orange (jobfair)
+      '#f5f5f5'  // fallback
+    ];
     summaryChart = new Chart(ctx, {
       type: 'bar',
-      data: { labels, datasets: [{ label: 'Reports', data: values, backgroundColor: '#2b7a78' }] },
+      data: {
+        labels,
+        datasets: [{
+          label: 'Reports',
+          data: values,
+          backgroundColor: labels.map((l,i)=>{
+            if(l.toLowerCase().includes('new')) return cardColors[0];
+            if(l.toLowerCase().includes('solved')) return cardColors[1];
+            if(l.toLowerCase().includes('not')) return cardColors[2];
+            if(l.toLowerCase().includes('job')) return cardColors[3];
+            return cardColors[4];
+          }),
+          borderColor: labels.map((l,i)=>{
+            if(l.toLowerCase().includes('new')) return '#1565c0';
+            if(l.toLowerCase().includes('solved')) return '#006400';
+            if(l.toLowerCase().includes('not')) return '#b00020';
+            if(l.toLowerCase().includes('job')) return '#e65100';
+            return '#aaa';
+          }),
+          borderWidth: 2
+        }]
+      },
       options: { responsive: true, maintainAspectRatio: false }
     });
   }catch(err){
