@@ -127,6 +127,7 @@ async function fetchSummaryAndRender(){
     const total = data.length;
     const solved = data.filter(r => r.status === 'solved').length;
     const notSolved = data.filter(r => r.status === 'not solved').length;
+    const newCount = data.filter(r => r.status === 'new').length;
     // Update dashboard stats
     const statsEl = document.getElementById('dashboard-stats');
     if(statsEl){
@@ -134,6 +135,14 @@ async function fetchSummaryAndRender(){
         <div><strong>ඉදිරිපත් වූ ගැටළු සංඛ්‍යාව</strong><br>${total}</div>
         <div><strong>විසඳන ලද සංඛ්‍යාව</strong><br>${solved}</div>
         <div><strong>නොවිසඳුණු ගැටළු සංඛ්‍යාව</strong><br>${notSolved}</div>
+      `;
+    }
+    const newEl = document.getElementById('dashboard-new');
+    if(newEl){
+      newEl.innerHTML = `
+        <div style="background:#e3f2fd;color:#1565c0;padding:18px 10px;border-radius:10px;font-size:1.1em;font-weight:500;box-shadow:0 2px 8px rgba(0,0,0,0.07);text-align:center;">
+          <strong>විසඳමින් පවතින හෝ අදාල අංශයට ඉදිරිපත් නොවූ ගැටළු</strong><br>${newCount}
+        </div>
       `;
     }
     const counts = data.reduce((acc, r)=>{ const s = r.status || 'unknown'; acc[s] = (acc[s]||0)+1; return acc; }, {});
